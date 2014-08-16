@@ -23,6 +23,9 @@ def home():
             '/static/flex.css',
             '/static/style.css',
             ],
+        metas={
+            'viewport': 'initial-scale=1, user-scalable=no',
+            },
         body = getHomeBody(),
         title='taproot',
         )

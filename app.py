@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from flask import Flask
 from flask import request
 from flask import redirect

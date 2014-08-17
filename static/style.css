@@ -25,6 +25,10 @@ input[type=textbox]{
     padding: 1em;
 }
 
+.definition{
+        flex: 1 1 auto;
+    }
+
 .meta{
     color: #999;
     padding-top: 1em;
@@ -39,10 +43,15 @@ input[type=textbox]{
     font-size: 200%;
 }
 
+.strongs{
+    margin-bottom: 1em;
+}
 
 .count{
     /* margin-right: 1em; */
+    margin-left: 1em;
 }
+
 
 .chart-container{
     padding-top:0;

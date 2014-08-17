@@ -20,6 +20,43 @@ def get_distinct_words():
         '''
     return [word for word, in get_rows(sql)]
 
+def get_strongs_record(number):
+    sql = '''
+        select lemma, xlit, pronounce, description, PartOfSpeech, Language
+        from Strongs
+        where StrongsID = %s
+        '''
+    params = [number]
+    return get_rows(sql, params)[0]
+
+def get_strongs_usage_counts(number):
+    sql = '''
+        select word, count(*)
+        from MainIndex m
+        join StrongsIndex si
+        on m.WordID = si.WordID
+        where si.StrongsID = %s
+        group by word
+        order by count(*) desc
+        '''
+    params = [number]
+    return get_rows(sql, params)
+
+def get_strongs_usage(number):
+    sql = '''
+        select Word, BookName, v.Chapter, v.VerseNum, VerseText
+        from MainIndex m
+        join StrongsIndex si
+        on m.WordID = si.WordID
+        join Verses v
+        on v.VerseId = m.VerseId
+        join Books b
+        on b.BookId = v.BookId
+        where si.StrongsID = %s
+        '''
+    params = [number]
+    return get_rows(sql, params)
+
 def get_word_meta(word):
     sql = '''
         select lemma, xlit, pronounce, language, count(*)

@@ -8,6 +8,7 @@ from model import get_distinct_words
 from json import dumps as json_encode
 from model import is_word
 from model import get_word_meta
+import model
 
 app = Flask(__name__)
 
@@ -32,6 +33,15 @@ def eng(text):
     return view.eng(
         word=text,
         meta=get_word_meta(text),
+        )
+
+@app.route('/strongs/<number>')
+def strongs(number):
+    return view.strongs(
+        number=number,
+        record=model.get_strongs_record(number),
+        usage=model.get_strongs_usage(number),
+        usage_counts=model.get_strongs_usage_counts(number),
         )
 
 @app.route('/ref')

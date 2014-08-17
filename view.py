@@ -72,14 +72,17 @@ def home():
         return  t.div('Description of what to do')
     return page(get_content())
 
+def html_encode_utf8(u):
+    return u.encode('ascii', 'xmlcharrefreplace')
+
 def eng(word, meta):
     def print_meta(language):
         return t._(
             t.div(
                 t.div(
-                    t.div(lemma.encode('ascii', 'xmlcharrefreplace')),
-                    t.div(xlit.encode('ascii', 'xmlcharrefreplace')),
-                    t.div(pronounce.encode('ascii', 'xmlcharrefreplace')),
+                    t.div(html_encode_utf8(lemma)),
+                    t.div(html_encode_utf8(xlit)),
+                    t.div(html_encode_utf8(pronounce)),
                     _class='flex-col',
                     ),
                 t.div(
@@ -144,5 +147,63 @@ def eng(word, meta):
             divider(),
             get_lang('heb'),
             _class='flex-col',
+            )
+    return page(get_content())
+
+def strongs(number, record, usage, usage_counts):
+    lemma, xlit, pronounce, description, PartOfSpeech, Language = record
+    color = cycle(colors)
+    highlight = cycle(highlights)
+    def get_content():
+        def get_data_dict(uc):
+            word, count = uc
+            return dict(
+                value=count,
+                color=next(color),
+                highlight=next(highlight),
+                label=word,
+                )
+        return t.div(
+            t.div(html_encode_utf8(lemma), _class='word'),
+            t.div(
+                t.div(
+                    t.div(html_encode_utf8(xlit)),
+                    t.div(html_encode_utf8(pronounce)),
+                    t.div(Language),
+                    t.div(PartOfSpeech),
+                    ),
+                t.div(
+                    t.div(html_encode_utf8(description)),
+                    _class='definition',
+                    ),
+                _class='flex-row tight strongs'
+                ),
+            t.div(
+                t.div(
+                    t._(
+                        t.div(
+                            t.div(html_encode_utf8(word)),
+                            t.div(str(count), _class='count tight'),
+                            _class='flex-row',
+                            )
+                        for word, count in usage_counts
+                        ),
+                    _class='flex-col tight',
+                    ),
+                t.div(
+                    t.canvas(id='chart_eng', width='150', height='150'),
+                    t.script('''
+                        $(document).ready(function(){{
+                            chart_update('eng', {});
+                            }});
+                        '''.format(
+                            json_encode(list(
+                                get_data_dict(uc) for uc in usage_counts)),
+                            )
+                        ),
+                    _class='chart-container',
+                    ),
+                _class='flex-row',
+                ),
             )
     return page(get_content())

@@ -24,9 +24,9 @@ def get_word_meta(word):
     sql = '''
         select lemma, xlit, pronounce, language, count(*)
         from MainIndex m
-        join strongsindex si
+        join StrongsIndex si
         on si.wordId = m.wordId
-        join strongs s
+        join Strongs s
         on s.strongsId = si.strongsId
         where word = %s
         group by word, lemma, xlit, pronounce, language

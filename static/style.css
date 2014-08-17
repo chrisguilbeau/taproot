@@ -5,7 +5,7 @@
 input[type=textbox]{
     padding:0.3em;
     text-align: center;
-    font-size: 200%;
+    font-size: 150%;
     margin:0;
     border:0;
     border-bottom: 0.1em solid #ddd;
@@ -46,7 +46,7 @@ input[type=textbox]{
 
 .chart-container{
     padding-top:0;
-    padding:1em;
+    padding:0.5em;
     text-align: right;
 }
 

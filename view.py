@@ -116,7 +116,7 @@ def eng(word, meta):
                     ),
                 t.div(
                     t.canvas(id='chart_{}'.format(lang),
-                        width='300', height='300'),
+                        width='150', height='150'),
                     t.script('''
                         $(document).ready(function(){{
                             chart_update_{}({});

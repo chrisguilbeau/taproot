@@ -59,6 +59,9 @@ def page(content):
             '/static/Chart.min.js',
             '/static/app.js',
             ],
+        metas={
+            'viewport': 'initial-scale=1, user-scalable=no',
+            },
         body=get_body(),
         title='taproot',
         )

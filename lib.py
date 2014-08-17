@@ -1,5 +1,7 @@
 from tag import Tags as t
 from flask import url_for
+from json import dumps as json_encode
+from json import loads as json_decode
 
 def html5(title='', css=[], js=[], body=''):
     def getJs():

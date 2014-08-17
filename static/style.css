@@ -20,3 +20,44 @@ input[type=textbox]{
     bottom:0;
     /* background:url(/static/logo.png) center center no-repeat; */
 }
+
+.content{
+    padding: 1em;
+}
+
+.meta{
+    color: #999;
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+.meta > div > div:first-child{
+    color: black;
+}
+
+.word{
+    font-size: 200%;
+}
+
+
+.count{
+    /* margin-right: 1em; */
+}
+
+.chart-container{
+    padding-top:0;
+    padding:1em;
+    text-align: right;
+}
+
+.divider{
+    color: #777;
+    text-align: right;
+    /* font-size: 70%; */
+}
+
+.divider > div{
+    border-top: 0.1em solid #aaa;
+    margin-top:0.2em;
+    margin-bottom: 0.2em;
+}

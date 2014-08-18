@@ -21,6 +21,10 @@ input[type=textbox]{
     /* background:url(/static/logo.png) center center no-repeat; */
 }
 
+.book{
+    margin-bottom: 1em;
+}
+
 .content{
     padding: 1em;
 }
@@ -31,6 +35,11 @@ input[type=textbox]{
         margin-left: 1em;
         margin-top: 0.5em;
     }
+
+.verse{
+    /* color: #777; */
+    margin-bottom: 1em;
+}
 
 .verse-word{
     font-weight: bold;
@@ -52,6 +61,10 @@ input[type=textbox]{
 
 .word{
     font-size: 200%;
+}
+
+.ref-word-link{
+    color: black;
 }
 
 .strongs{

@@ -38,3 +38,8 @@ function chart_update_greek(data){
 function chart_update_heb(data){
     chart_update('heb', data);
 }
+
+function scrollToAnchor(aid){
+    var aTag = $("a[name='"+ aid +"']");
+    $('html,body').animate({scrollTop: aTag.offset().top},'slow');
+}

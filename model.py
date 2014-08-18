@@ -20,6 +20,23 @@ def get_distinct_words():
         '''
     return [word for word, in get_rows(sql)]
 
+def get_ref_words(book, chap):
+    sql = '''
+        select BookName, Chapter, VerseNum, Word, Punc, Italic,
+            cParen, oParen, StrongsID
+        from MainIndex mi
+        join Books b
+        on b.bookId = mi.bookId
+        join BookAliases ba
+        on ba.bookId = b.bookId
+        left join StrongsIndex si
+        on si.wordId = mi.wordId
+        where Alias = %s
+        and chapter = %s
+        '''
+    params = [book, chap]
+    return get_rows(sql, params)
+
 def get_strongs_record(number):
     sql = '''
         select lemma, xlit, pronounce, description, PartOfSpeech, Language

@@ -151,6 +151,52 @@ def eng(word, meta):
             )
     return page(get_content())
 
+def ref(book, chapter, verse, words):
+    _verse = verse
+    def get_content():
+        verse_words = defaultdict(list)
+        for book, chap, verse, word, punc, isItalic, isOp, isCl, strongs in words:
+            verse_words[verse].append([
+                word,
+                punc,
+                isOp,
+                isCl,
+                strongs,
+                ])
+        return t._(
+            t.div('{} {}'.format(book, chapter), _class='book'),
+            t._(
+                t.div(
+                    t.a(str(verse), _name='{}'.format(verse)),
+                    # t.span(str(verse), '&nbsp;'),
+                    t.span(
+                        t._(
+                            t.a(
+                                word,
+                                href='/strongs/{}'.format(strongs),
+                                _class='ref-word-link',
+                                ) if strongs else word,
+                            punc or '',
+                            '(' if isOp else '',
+                            ')' if isCl else '',
+                            ' ',
+                        )
+                        for word, punc, isOp, isCl, strongs in words
+                        ),
+                    _class='verse',
+                    )
+                for verse, words in sorted(verse_words.items())
+                ),
+            t.script('''
+                scrollToAnchor({});
+                '''.format(json_encode(str(_verse)))) if _verse else t._(),
+            )
+    return page(get_content())
+
+def na(text):
+    return page(
+        '{} has no strongs number and does not appear to be a valid reference'.format(text))
+
 def strongs(number, record, usage, usage_counts):
     lemma, xlit, pronounce, description, PartOfSpeech, Language = record
     color = cycle(colors)

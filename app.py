@@ -12,6 +12,16 @@ import model
 
 app = Flask(__name__)
 
+def parse_ref(text):
+    if text.count(' ') == 1:
+        book, rest = text.split(' ')
+        if rest.count(':') == 1:
+            chap, verse = rest.split(':')
+        else:
+            chap = rest
+            verse = None
+        return book, chap, verse
+
 @app.route('/')
 def home():
     return view.home()
@@ -19,14 +29,16 @@ def home():
 @app.route('/router')
 def router():
     text = request.args['text']
-    def is_ref(text):
-        return False
     if is_word(text):
         return redirect('/eng/{}'.format(text))
-    elif is_ref(text):
-        return reidrect('/ref/{}'.format(text))
+    elif parse_ref(text):
+        book, chap, verse = parse_ref(text)
+        return (
+            redirect('/ref/{}/{}/{}'.format(book, chap, verse)) if verse else
+            redirect('/ref/{}/{}'.format(book, chap))
+            )
     else:
-        return 'nothing my friend'
+        return redirect('/na/{}'.format(text))
 
 @app.route('/eng/<text>')
 def eng(text):
@@ -34,6 +46,10 @@ def eng(text):
         word=text,
         meta=get_word_meta(text),
         )
+
+@app.route('/na/<text>')
+def na(text):
+    return view.na(text)
 
 @app.route('/strongs/<number>')
 def strongs(number):
@@ -44,9 +60,20 @@ def strongs(number):
         usage_counts=model.get_strongs_usage_counts(number),
         )
 
-@app.route('/ref')
-def ref():
-    return str(request.form)
+@app.route('/ref/<book>/<chap>')
+@app.route('/ref/<book>/<chap>/<verse>')
+def ref(book, chap, verse=None):
+    words = model.get_ref_words(book, chap)
+    if not words:
+        return redirect('/na/{} {}'.format(book, chap))
+    book = words[0][0]
+    chapter = chap
+    return view.ref(
+        book = words[0][0],
+        chapter = chap,
+        verse = verse,
+        words = words,
+        )
 
 @app.route('/autocomplete_words/<term>')
 def autocomplete_words(term):

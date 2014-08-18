@@ -125,7 +125,8 @@ def eng(word, meta):
                     ),
                 t.div(
                     t.canvas(id='chart_{}'.format(lang),
-                        width='120', height='120'),
+                        width='120', height='120'
+                        ),
                     t.script('''
                         $(document).ready(function(){{
                             chart_update_{}({});

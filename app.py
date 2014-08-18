@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from argparse import ArgumentParser
 from flask import Flask
 from flask import request
 from flask import redirect
@@ -81,4 +82,12 @@ def autocomplete_words(term):
         if word.startswith(term.lower())))
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    def get_app_desc():
+        return 'taproot webserver'
+    parser = ArgumentParser(description=get_app_desc(), add_help=False)
+    parser.add_argument('-?', '--help', action='help',
+        help='show this help message and exit')
+    parser.add_argument('-p', metavar='port', type=int,
+        default=5000, help='port for the HTTP server (default: 5000)')
+    args = parser.parse_args()
+    app.run(debug=True, host='0.0.0.0', port=args.p)

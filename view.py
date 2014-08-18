@@ -79,7 +79,7 @@ def html_encode_utf8(u):
 def eng(word, meta):
     def print_meta(language):
         return t._(
-            t.div(
+            t.a(
                 t.div(
                     t.div(html_encode_utf8(lemma)),
                     t.div(html_encode_utf8(xlit)),
@@ -90,6 +90,7 @@ def eng(word, meta):
                     '{:,}'.format(count),
                     _class='count tight',
                     ),
+                href='/strongs/{}'.format(strongs),
                 _class='flex-row meta',
                 )
             for (
@@ -97,15 +98,15 @@ def eng(word, meta):
                 xlit,
                 pronounce,
                 lang,
+                strongs,
                 count
                 )in meta if lang == language
             )
-
     def get_content():
         color = cycle(colors)
         highlight = cycle(highlights)
         def get_data_dict(m):
-            lemma, xlit, pro, lang, count = m
+            lemma, xlit, pro, lang, strongs, count = m
             return dict(
                 value=count,
                 color=next(color),
@@ -116,11 +117,12 @@ def eng(word, meta):
             return t.div(
                 t.div(
                     t.div(word, _class='word') if show_word else t._(),
-                    print_meta(lang)
+                    print_meta(lang),
+                    _class='tight',
                     ),
                 t.div(
                     t.canvas(id='chart_{}'.format(lang),
-                        width='150', height='150'),
+                        width='120', height='120'),
                     t.script('''
                         $(document).ready(function(){{
                             chart_update_{}({});
@@ -129,7 +131,7 @@ def eng(word, meta):
                             lang,
                             json_encode(list(
                                 get_data_dict(m) for m in meta
-                                    if m[-2] == lang)),
+                                    if m[-3] == lang)),
                             )
                         ),
                     _class='chart-container',
@@ -144,7 +146,8 @@ def eng(word, meta):
                 _class='divider',
                 )
         return t.div(
-            get_lang('greek', show_word=True),
+            t.div(word, _class='word'),
+            get_lang('greek', show_word=False),
             divider(),
             get_lang('heb'),
             _class='flex-col',
@@ -167,7 +170,7 @@ def ref(book, chapter, verse, words):
             t.div('{} {}'.format(book, chapter), _class='book'),
             t._(
                 t.div(
-                    t.a(str(verse), _name='{}'.format(verse)),
+                    t.a(str(verse), '&nbsp', _name='{}'.format(verse)),
                     # t.span(str(verse), '&nbsp;'),
                     t.span(
                         t._(
@@ -260,17 +263,20 @@ def strongs(number, record, usage, usage_counts):
                 _class='flex-row',
                 ),
             t.div(
-                t.div(
-                    t.div(word, _class='verse-word'),
-                    t._(
-                        t.div(
-                            t.div(ref),
-                            t.div(text, _class='verse-text'),
-                            )
-                        for ref, text in verses
-                        ),
-                    )
-                for word, verses in get_words_verses_dict().items()
+                t._(
+                    t.div(
+                        t.div(word, _class='verse-word'),
+                        t._(
+                            t.div(
+                                t.div(ref),
+                                t.div(text, _class='verse-text'),
+                                )
+                            for ref, text in verses
+                            ),
+                        )
+                    for word, verses in get_words_verses_dict().items()
+                    ),
+                _class='verses-container',
                 ),
             )
     return page(get_content())

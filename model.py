@@ -76,14 +76,14 @@ def get_strongs_usage(number):
 
 def get_word_meta(word):
     sql = '''
-        select lemma, xlit, pronounce, language, count(*)
+        select lemma, xlit, pronounce, language, s.strongsId, count(*)
         from MainIndex m
         join StrongsIndex si
         on si.wordId = m.wordId
         join Strongs s
         on s.strongsId = si.strongsId
         where word = %s
-        group by word, lemma, xlit, pronounce, language
+        group by word, lemma, xlit, pronounce, language, s.strongsId
         order by count(*) desc
         '''
     params = [word]

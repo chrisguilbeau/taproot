@@ -41,6 +41,10 @@ input[type=textbox]{
     margin-bottom: 1em;
 }
 
+.verses-container{
+    margin-top: 1em;
+}
+
 .verse-word{
     font-weight: bold;
 }
@@ -53,6 +57,12 @@ input[type=textbox]{
     color: #999;
     padding-top: 1em;
     padding-bottom: 1em;
+    border-radius: 0.5em;
+    text-decoration: none;
+}
+
+.meta:active{
+    background-color: #ddd;
 }
 
 .meta > div > div:first-child{

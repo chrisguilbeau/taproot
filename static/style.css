@@ -26,8 +26,19 @@ input[type=textbox]{
 }
 
 .definition{
+        -webkit-flex: 1 1 auto;
         flex: 1 1 auto;
+        margin-left: 1em;
+        margin-top: 0.5em;
     }
+
+.verse-word{
+    font-weight: bold;
+}
+
+.verse-text{
+    margin-bottom: 1em;
+}
 
 .meta{
     color: #999;

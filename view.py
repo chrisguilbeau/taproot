@@ -1,4 +1,5 @@
 from itertools import cycle
+from collections import defaultdict
 from lib import t
 from lib import html5
 from lib import url_for
@@ -155,6 +156,12 @@ def strongs(number, record, usage, usage_counts):
     color = cycle(colors)
     highlight = cycle(highlights)
     def get_content():
+        def get_words_verses_dict():
+            result = defaultdict(list)
+            for word, book, chap, verse, text in usage:
+                result[word].append(['{} {}:{}'.format(book, chap, verse),
+                    text.replace(word, '<b>{}</b>'.format(word))])
+            return result
         def get_data_dict(uc):
             word, count = uc
             return dict(
@@ -164,9 +171,9 @@ def strongs(number, record, usage, usage_counts):
                 label=word,
                 )
         return t.div(
-            t.div(html_encode_utf8(lemma), _class='word'),
             t.div(
                 t.div(
+                    t.div(html_encode_utf8(lemma), _class='word'),
                     t.div(html_encode_utf8(xlit)),
                     t.div(html_encode_utf8(pronounce)),
                     t.div(Language),
@@ -184,10 +191,11 @@ def strongs(number, record, usage, usage_counts):
                         t.div(
                             t.div(html_encode_utf8(word)),
                             t.div(str(count), _class='count tight'),
-                            _class='flex-row',
+                            _class='flex-row tight',
                             )
                         for word, count in usage_counts
                         ),
+                    t.div(),
                     _class='flex-col tight',
                     ),
                 t.div(
@@ -204,6 +212,19 @@ def strongs(number, record, usage, usage_counts):
                     _class='chart-container',
                     ),
                 _class='flex-row',
+                ),
+            t.div(
+                t.div(
+                    t.div(word, _class='verse-word'),
+                    t._(
+                        t.div(
+                            t.div(ref),
+                            t.div(text, _class='verse-text'),
+                            )
+                        for ref, text in verses
+                        ),
+                    )
+                for word, verses in get_words_verses_dict().items()
                 ),
             )
     return page(get_content())

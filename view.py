@@ -70,7 +70,10 @@ def page(content):
 
 def home():
     def get_content():
-        return  t.div('Description of what to do')
+        return  t.div('''
+            Try a word like faith, hope or love. Try a reference
+            like Gen 1, Matthew 28, or John 3:16.
+            ''')
     return page(get_content())
 
 def html_encode_utf8(u):

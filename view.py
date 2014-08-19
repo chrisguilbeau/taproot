@@ -39,10 +39,10 @@ def page(content):
                 t.input(
                     type='textbox',
                     _name='text',
-                    placeholder='Type word or reference',
+                    placeholder='Chapter, Verse, or Word',
                     ),
                 action=url_for('router'),
-                _class='flex-col tight',
+                _class='tight search-form',
                 ),
             t.div(
                 content,
@@ -84,10 +84,12 @@ def eng(word, meta):
         return t._(
             t.a(
                 t.div(
-                    t.div(html_encode_utf8(lemma)),
-                    t.div(html_encode_utf8(xlit)),
-                    t.div(html_encode_utf8(pronounce)),
-                    _class='flex-col',
+                    t.span(html_encode_utf8(xlit)),
+                    t.span(' ('),
+                    t.span(html_encode_utf8(lemma)),
+                    t.span(')'),
+                    # t.div(html_encode_utf8(pronounce)),
+                    # _class='flex-col',
                     ),
                 t.div(
                     '{:,}'.format(count),
@@ -117,9 +119,16 @@ def eng(word, meta):
                 label=lemma,
                 )
         def get_lang(lang, show_word=False):
+            def get_language_from_lang(lang):
+                return 'hebrew' if lang == 'heb' else 'greek'
             return t.div(
                 t.div(
                     t.div(word, _class='word') if show_word else t._(),
+                    t.div(
+                        'Tap {} word for more info'.format(
+                            get_language_from_lang(lang)),
+                        _class='subhead',
+                        ),
                     print_meta(lang),
                     _class='tight',
                     ),
@@ -144,9 +153,7 @@ def eng(word, meta):
                 )
         def divider():
             return t.div(
-                'Greek',
                 t.div(),
-                'Hebrew',
                 _class='divider',
                 )
         return t.div(
@@ -172,6 +179,8 @@ def ref(book, chapter, verse, words):
                 ])
         return t._(
             t.div('{} {}'.format(book, chapter), _class='book'),
+            t.div('Tap an underlined word for source text',
+                _class='section-label',),
             t._(
                 t.div(
                     t.a(str(verse), '&nbsp', _name='{}'.format(verse)),
@@ -207,6 +216,7 @@ def na(text):
 def strongs(number, record, usage, usage_counts):
     lemma, xlit, pronounce, description, PartOfSpeech, Language = record
     color = cycle(colors)
+    color2 = cycle(colors)
     highlight = cycle(highlights)
     def get_content():
         def get_words_verses_dict():
@@ -240,11 +250,21 @@ def strongs(number, record, usage, usage_counts):
                 ),
             t.div(
                 t.div(
+                    t.div('Translated As', _class='section-label tight'),
                     t._(
                         t.div(
+                            # t.div(
+                            #     t.div(
+                            #         _class='swatch',
+                            #         style='''
+                            #             background-color: {};
+                            #             '''.format(next(color2)),
+                            #         ),
+                            #     _class='tight',
+                            #     ),
                             t.div(html_encode_utf8(word)),
                             t.div(str(count), _class='count tight'),
-                            _class='flex-row tight',
+                            _class='flex-row tight center',
                             )
                         for word, count in usage_counts
                         ),
@@ -267,18 +287,23 @@ def strongs(number, record, usage, usage_counts):
                 _class='flex-row',
                 ),
             t.div(
+                t.div('Appears In', _class='section-label'),
                 t._(
                     t.div(
-                        t.div(word, _class='verse-word'),
+                        # t.div(word, _class='verse-word'),
                         t._(
                             t.div(
-                                t.div(ref),
-                                t.div(text, _class='verse-text'),
+                                t.span(ref),
+                                t.span(' - '),
+                                t.span(text),
+                                _class='verse-text'
                                 )
                             for ref, text in verses
                             ),
                         )
-                    for word, verses in get_words_verses_dict().items()
+                    for word, verses in sorted(
+                        get_words_verses_dict().items(),
+                            key=lambda a: len(a[1]), reverse=True)
                     ),
                 _class='verses-container',
                 ),

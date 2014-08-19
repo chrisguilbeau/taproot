@@ -3,13 +3,21 @@
 }
 
 input[type=textbox]{
-    padding:0.3em;
-    text-align: center;
+    padding:0.5em;
+    padding-bottom: 0.3em;
+    padding-top: 0.2em;
     font-size: 150%;
-    margin:0;
-    border:0;
-    border-bottom: 0.1em solid #ddd;
+    margin:0.5em;;
+    margin-bottom: 0em;
+    border:1px solid #aaa;
+    border-radius: 0.2em;
     outline: none;
+}
+
+.section-label{
+    color: #777;
+    font-style: italic;
+    margin-bottom: 0.5em;
 }
 
 .main{
@@ -22,7 +30,7 @@ input[type=textbox]{
 }
 
 .book{
-    margin-bottom: 1em;
+    font-size: 170%;
 }
 
 .content{
@@ -54,19 +62,15 @@ input[type=textbox]{
 }
 
 .meta{
-    color: #999;
-    padding-top: 1em;
-    padding-bottom: 1em;
+    color: #000;
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
     border-radius: 0.5em;
     text-decoration: none;
 }
 
 .meta:active{
     background-color: #ddd;
-}
-
-.meta > div > div:first-child{
-    color: black;
 }
 
 .word{
@@ -101,6 +105,26 @@ input[type=textbox]{
 
 .divider > div{
     border-top: 0.1em solid #aaa;
-    margin-top:0.2em;
-    margin-bottom: 0.2em;
+    margin-top:1em;
+    margin-bottom: 1em;
+}
+
+.search-form{
+    text-align: center;
+}
+
+.subhead{
+    font-style: italic;
+    color: #777;
+    margin-bottom: 0.5em;
+}
+
+.swatch{
+    height: 1em;
+    width: 1em;
+    border-radius: 0.2em;
+    margin-right: 0.3em;
+    margin-bottom: 0.15em;
+    margin-top: 0.15em;
+    margin-left: 0em;
 }

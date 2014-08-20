@@ -137,35 +137,37 @@ def eng(word, meta):
         def get_lang(lang, show_word=False):
             def get_language_from_lang(lang):
                 return 'hebrew' if lang == 'heb' else 'greek'
-            return t.div(
+            return t._(
                 t.div(
-                    t.div(word, _class='word') if show_word else t._(),
+                    'Tap {} word for info'.format(
+                        get_language_from_lang(lang)),
+                    _class='subhead',
+                    ),
+                t.div(
                     t.div(
-                        'Tap {} word for more info'.format(
-                            get_language_from_lang(lang)),
-                        _class='subhead',
+                        t.div(word, _class='word') if show_word else t._(),
+                        print_meta(lang),
+                        _class='tight',
                         ),
-                    print_meta(lang),
-                    _class='tight',
+                    t.div(
+                        t.canvas(id='chart_{}'.format(lang),
+                            width='120', height='120'
+                            ),
+                        t.script('''
+                            $(document).ready(function(){{
+                                chart_update_{}({});
+                                }});
+                            '''.format(
+                                lang,
+                                json_encode(list(
+                                    get_data_dict(m) for m in meta
+                                        if m[-3] == lang)),
+                                )
+                            ),
+                        _class='chart-container',
+                        ),
+                    _class='lang flex-row',
                     ),
-                t.div(
-                    t.canvas(id='chart_{}'.format(lang),
-                        width='120', height='120'
-                        ),
-                    t.script('''
-                        $(document).ready(function(){{
-                            chart_update_{}({});
-                            }});
-                        '''.format(
-                            lang,
-                            json_encode(list(
-                                get_data_dict(m) for m in meta
-                                    if m[-3] == lang)),
-                            )
-                        ),
-                    _class='chart-container',
-                    ),
-                _class='lang flex-row',
                 )
         def divider():
             return t.div(

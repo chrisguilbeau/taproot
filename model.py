@@ -1,16 +1,20 @@
 from pymysql import connect
-bible = connect(host='localhost', port=3306,
-    user='root', passwd='', db='bible2', charset='utf8')
+
+def getConnection():
+    return connect(host='localhost', port=3306,
+        user='root', passwd='', db='bible2', charset='utf8')
 
 class Rows(tuple):
     pass
 
 def get_rows(sql, params=[]):
+    bible = getConnection()
     cursor = bible.cursor()
     cursor.execute(sql, params)
     result = Rows(cursor.fetchall())
     result.fields = [meta[0] for meta in cursor.description]
     cursor.close()
+    bible.close()
     return result
 
 def get_distinct_words():
@@ -105,6 +109,7 @@ def get_word_meta(word):
     return get_rows(sql, params)
 
 def make_edit(wordId, strongsId):
+    bible = getConnection()
     cursor = bible.cursor()
     sql = '''
         delete from StrongsIndex
@@ -121,6 +126,7 @@ def make_edit(wordId, strongsId):
         cursor.execute(sql, params)
     bible.commit()
     cursor.close()
+    bible.close()
 
 
 def is_word(word):

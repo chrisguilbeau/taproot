@@ -3,13 +3,14 @@ from argparse import ArgumentParser
 from flask import Flask
 from flask import request
 from flask import redirect
-from flask import url_for
 import view
 from model import get_distinct_words
 from json import dumps as json_encode
 from model import is_word
 from model import get_word_meta
 from model import get_verse_edit_data
+from model import get_edit_strongs_data
+from model import get_strongs_record
 from model import make_edit
 import model
 
@@ -59,6 +60,14 @@ def edit(book, chap, verse):
         data=get_verse_edit_data(book, chap, verse),
         )
 
+@app.route('/editStr/<strongsId>', methods=['GET'])
+def editStr(strongsId):
+    return view.editStr(
+        strongsId=strongsId,
+        strongs=get_strongs_record(strongsId),
+        data=get_edit_strongs_data(strongsId),
+        )
+
 @app.route('/edit/<book>/<chap>/<verse>', methods=['POST'])
 def makeedit(book, chap, verse):
     form = request.form
@@ -87,7 +96,6 @@ def ref(book, chap, verse=None):
     if not words:
         return redirect('/na/{} {}'.format(book, chap))
     book = words[0][0]
-    chapter = chap
     return view.ref(
         book = words[0][0],
         chapter = chap,

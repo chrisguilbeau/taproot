@@ -83,6 +83,51 @@ def edit(book, chap, verse, data):
             )
     return page(get_content())
 
+def editStr(strongsId, strongs, data):
+    lemma, xlit, pron, desc, pos, lang = strongs
+    words = defaultdict(list)
+    for word, book, chap, verse, text in data:
+        words[word].append((book, chap, verse, text))
+    def get_content():
+        def getPrev():
+            base = str(int(strongsId[1:]) - 1)
+            return ''.join([lang[0].upper(), base])
+        def getNext():
+            base = str(int(strongsId[1:]) + 1)
+            return ''.join([lang[0].upper(), base])
+        prev = getPrev()
+        _next = getNext()
+        return t._(
+            t.div(
+                t.a(_next, href='/editStr/{}'.format(prev)),
+                t.span(' << '),
+                strongsId,
+                t.span(' >> '),
+                t.a(_next, href='/editStr/{}'.format(_next)),
+                ),
+            t.div(html_encode_utf8(xlit)),
+            t.div(html_encode_utf8(lemma)),
+            t.div(html_encode_utf8(desc)),
+            t._(
+                t.div(
+                    t.h2(word),
+                    t._(
+                        t.div(
+                            t.a(
+                                '{} {}:{} - '.format(book, chap, verse),
+                                text,
+                                href='/edit/{}/{}/{}'.format(
+                                    book, chap, verse
+                                    ),
+                                ),
+                            )
+                        for book, chap, verse, text in metas),
+                    )
+                for word, metas in words.iteritems()
+                )
+            )
+    return page(get_content())
+
 
 def home():
     def get_content():

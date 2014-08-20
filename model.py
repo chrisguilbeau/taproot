@@ -78,6 +78,21 @@ def get_strongs_usage(number):
     params = [number]
     return get_rows(sql, params)
 
+def get_edit_strongs_data(strongsId):
+    sql = '''
+        select mi.Word, b.BookName, v.Chapter, v.VerseNum, v.VerseText
+        from MainIndex mi
+        join StrongsIndex si
+        on si.WordID = mi.WordID
+        join Books b
+        on b.BookID = mi.BookID
+        join Verses v
+        on v.VerseID = mi.VerseID
+        where StrongsID = %s
+        '''
+    params = [strongsId]
+    return get_rows(sql, params)
+
 def get_verse_edit_data(book, chap, verse):
     sql = '''
         select mi.WordId, Word, StrongsId

@@ -119,6 +119,7 @@ def make_edit(wordId, strongsId):
             '''
         params = [wordId, strongsId]
         cursor.execute(sql, params)
+    bible.commit()
     cursor.close()
 
 

@@ -9,6 +9,8 @@ from model import get_distinct_words
 from json import dumps as json_encode
 from model import is_word
 from model import get_word_meta
+from model import get_verse_edit_data
+from model import make_edit
 import model
 
 app = Flask(__name__)
@@ -47,6 +49,23 @@ def eng(text):
         word=text,
         meta=get_word_meta(text),
         )
+
+@app.route('/edit/<book>/<chap>/<verse>', methods=['GET'])
+def edit(book, chap, verse):
+    return view.edit(
+        book=book,
+        chap=chap,
+        verse=verse,
+        data=get_verse_edit_data(book, chap, verse),
+        )
+
+@app.route('/edit/<book>/<chap>/<verse>', methods=['POST'])
+def makeedit(book, chap, verse):
+    form = request.form
+    wordId = int(form['wordId'])
+    strongsId = form['strongsId'] or None
+    make_edit(wordId, strongsId)
+    return redirect('/edit/{}/{}/{}'.format(book, chap, verse))
 
 @app.route('/na/<text>')
 def na(text):

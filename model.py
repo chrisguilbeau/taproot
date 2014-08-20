@@ -74,6 +74,21 @@ def get_strongs_usage(number):
     params = [number]
     return get_rows(sql, params)
 
+def get_verse_edit_data(book, chap, verse):
+    sql = '''
+        select mi.WordId, Word, StrongsId
+        from MainIndex mi
+        left join StrongsIndex si
+        on si.WordId = mi.WordId
+        join Books b
+        on b.bookid = mi.bookid
+        where b.BookName = %s
+        and chapter = %s
+        and VerseNum = %s
+        '''
+    params = [book, chap, verse]
+    return get_rows(sql, params)
+
 def get_word_meta(word):
     sql = '''
         select lemma, xlit, pronounce, language, s.strongsId, count(*)
@@ -88,6 +103,24 @@ def get_word_meta(word):
         '''
     params = [word]
     return get_rows(sql, params)
+
+def make_edit(wordId, strongsId):
+    cursor = bible.cursor()
+    sql = '''
+        delete from StrongsIndex
+        where WordID = %s
+        '''
+    params = [wordId]
+    cursor.execute(sql, params)
+    if strongsId:
+        sql = '''
+            insert into StrongsIndex (WordID, StrongsID)
+            values (%s, %s)
+            '''
+        params = [wordId, strongsId]
+        cursor.execute(sql, params)
+    cursor.close()
+
 
 def is_word(word):
     sql = '''

@@ -67,6 +67,22 @@ def page(content):
         title='taproot',
         )
 
+def edit(book, chap, verse, data):
+    def get_content():
+        return t._(
+            t.div(
+                t.form(
+                    word,
+                    t.input(type='hidden', _name='wordId', value=str(wordId)),
+                    t.input(type='text', _name='strongsId', value=strongsId or ''),
+                    t.input(type='submit'),
+                    method='POST',
+                    ),
+                )
+            for wordId, word, strongsId in data
+            )
+    return page(get_content())
+
 
 def home():
     def get_content():

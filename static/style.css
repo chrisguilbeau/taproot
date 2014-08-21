@@ -54,7 +54,8 @@ input[type=textbox]{
 }
 
 .verse-word{
-    font-weight: bold;
+    font-size: 170%;
+    margin-bottom: 0.5em;
 }
 
 .verse-text{

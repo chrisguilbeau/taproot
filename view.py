@@ -285,7 +285,7 @@ def strongs(number, record, usage, usage_counts):
         def get_words_verses_dict():
             result = defaultdict(list)
             for word, book, chap, verse, text in usage:
-                result[word].append(['{} {}:{}'.format(book, chap, verse),
+                result[word.lower()].append(['{} {}:{}'.format(book, chap, verse),
                     text.replace(word, '<b>{}</b>'.format(word))])
             return result
         def get_data_dict(uc):
@@ -350,10 +350,11 @@ def strongs(number, record, usage, usage_counts):
                 _class='flex-row',
                 ),
             t.div(
-                t.div('Appears In', _class='section-label'),
+                t.div('Appears As/In', _class='section-label'),
                 t._(
                     t.div(
-                        # t.div(word, _class='verse-word'),
+                        t.div('{}'.format(word, len(verses)),
+                            _class='verse-word'),
                         t._(
                             t.div(
                                 t.span(ref),

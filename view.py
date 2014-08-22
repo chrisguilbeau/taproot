@@ -145,10 +145,10 @@ def eng(word, meta):
         return t._(
             t.a(
                 t.div(
-                    t.span(html_encode_utf8(xlit)),
-                    t.span(' ('),
-                    t.span(html_encode_utf8(lemma)),
-                    t.span(')'),
+                    t.div(html_encode_utf8(xlit), _class='tight'),
+                    t.div(
+                        '{}'.format(html_encode_utf8(lemma)),
+                        ),
                     # t.div(html_encode_utf8(pronounce)),
                     # _class='flex-col',
                     ),
@@ -157,7 +157,7 @@ def eng(word, meta):
                     _class='count tight',
                     ),
                 href='/strongs/{}'.format(strongs),
-                _class='flex-row meta',
+                _class='flex-row meta center',
                 )
             for (
                 lemma,
@@ -199,7 +199,7 @@ def eng(word, meta):
                             width='120', height='120'
                             ),
                         t.script('''
-                            $(document).ready(function(){{
+                            $(window).resize(function(){{
                                 chart_update_{}({});
                                 }});
                             '''.format(
@@ -213,6 +213,20 @@ def eng(word, meta):
                         ),
                     _class='lang flex-row',
                     ),
+                    t.script('''
+                        $(document).ready(function(){
+                            var widths = [];
+                            $('canvas').each(function(i, el){{
+                                var canvas = $(el);
+                                widths.push(canvas.parent().width());
+                                }});
+                            var min_width = Math.min.apply(Math, widths);
+                            $('canvas')
+                                .attr('width', min_width)
+                                .attr('height', min_width);
+                            $(window).resize();
+                            });
+                        '''),
                 )
         def divider():
             return t.div(

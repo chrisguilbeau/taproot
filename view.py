@@ -220,6 +220,11 @@ def eng(word, meta):
                                 var canvas = $(el);
                                 widths.push(canvas.parent().width());
                                 }});
+                            $('.lang').each(function(i, el){{
+                                var lang = $(el);
+                                widths.push(lang.height());
+                                }});
+                            console.log(widths);
                             var min_width = Math.min.apply(Math, widths);
                             $('canvas')
                                 .attr('width', min_width)

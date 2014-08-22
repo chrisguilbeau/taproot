@@ -225,7 +225,7 @@ def eng(word, meta):
                                 widths.push(lang.height());
                                 }});
                             console.log(widths);
-                            var min_width = Math.min.apply(Math, widths);
+                            var min_width = Math.min.apply(Math, widths) - 20;
                             $('canvas')
                                 .attr('width', min_width)
                                 .attr('height', min_width);

@@ -48,8 +48,8 @@ input[type=textbox]{
 .definition{
         -webkit-flex: 1 1 auto;
         flex: 1 1 auto;
-        margin-left: 1em;
-        margin-top: 0.5em;
+        margin-left: 2em;
+        margin-top: 0.2em;
     }
 
 .verse{
@@ -83,8 +83,12 @@ input[type=textbox]{
     background-color: #ddd;
 }
 
-.word{
-    font-size: 200%;
+.word, .orig_word{
+    font-size: 170%;
+}
+
+.orig_word{
+    color: #999;
 }
 
 .ref-word-link{
@@ -130,11 +134,9 @@ input[type=textbox]{
 }
 
 .swatch{
-    height: 1em;
-    width: 1em;
+    padding: 0.2em;
     border-radius: 0.2em;
-    margin-right: 0.3em;
-    margin-bottom: 0.15em;
-    margin-top: 0.15em;
-    margin-left: 0em;
+    text-align: center;
+    color: white;
+    min-width: 1em;
 }

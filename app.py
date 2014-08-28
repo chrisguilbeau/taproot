@@ -17,8 +17,8 @@ import model
 app = Flask(__name__)
 
 def parse_ref(text):
-    if text.count(' ') == 1:
-        book, rest = text.split(' ')
+    if text.count(' ') > 0:
+        book, rest = text.rsplit(' ', 1)
         if rest.count(':') == 1:
             chap, verse = rest.split(':')
         else:
@@ -80,27 +80,27 @@ def makeedit(book, chap, verse):
 def na(text):
     return view.na(text)
 
-@app.route('/strongs/<number>')
-def strongs(number):
+@app.route('/strongs/<strongs>')
+def strongs(strongs):
     return view.strongs(
-        number=number,
-        record=model.get_strongs_record(number),
-        usage=model.get_strongs_usage(number),
-        usage_counts=model.get_strongs_usage_counts(number),
+        strongs=strongs,
+        word=model.get_strongs_word(strongs),
+        jsons=model.get_strongs_jsons(strongs),
+        usage_counts=model.get_strongs_usage_counts(strongs),
+        usage=model.get_strongs_usage(strongs),
         )
 
 @app.route('/ref/<book>/<chap>')
 @app.route('/ref/<book>/<chap>/<verse>')
 def ref(book, chap, verse=None):
-    words = model.get_ref_words(book, chap)
-    if not words:
+    data = model.get_ref_data(book, chap)
+    if not data:
         return redirect('/na/{} {}'.format(book, chap))
-    book = words[0][0]
     return view.ref(
-        book = words[0][0],
-        chapter = chap,
-        verse = verse,
-        words = words,
+        book=data[0][0],
+        chapter=chap,
+        verse=verse,
+        data=data,
         )
 
 @app.route('/autocomplete_words/<term>')

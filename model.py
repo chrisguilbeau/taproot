@@ -2,7 +2,7 @@ from pymysql import connect
 
 def getConnection():
     return connect(host='localhost', port=3306,
-        user='root', passwd='', db='bible2', charset='utf8')
+        user='root', passwd='', db='taproot', charset='utf8')
 
 class Rows(tuple):
     pass
@@ -24,22 +24,38 @@ def get_distinct_words():
         '''
     return [word for word, in get_rows(sql)]
 
-def get_ref_words(book, chap):
+def get_ref_data(book, chap):
     sql = '''
-        select BookName, Chapter, VerseNum, Word, Punc, Italic,
-            cParen, oParen, StrongsID
-        from MainIndex mi
-        join Books b
-        on b.bookId = mi.bookId
-        join BookAliases ba
-        on ba.bookId = b.bookId
-        left join StrongsIndex si
-        on si.wordId = mi.wordId
-        where Alias = %s
-        and chapter = %s
+         select bn.name as book, chapter, verse, phrase, strongs
+         from bible b
+         join book_name bn
+         on bn.book_id = b.book_id
+         join book_alias ba
+         on ba.book_id = b.book_id
+         where ba.alias like %s
+         and chapter = %s
+         order by verse, phrase_order
         '''
     params = [book, chap]
     return get_rows(sql, params)
+
+def get_strongs_word(strongs):
+    sql = '''
+        select word
+        from strongs
+        where strongs = %s
+        '''
+    params = [strongs]
+    return get_rows(sql, params)[0][0]
+
+def get_strongs_jsons(strongs):
+    sql = '''
+        select json
+        from strongs_json
+        where strongs = %s
+        '''
+    params = [strongs]
+    return [json for json, in get_rows(sql, params)]
 
 def get_strongs_record(number):
     sql = '''
@@ -52,12 +68,10 @@ def get_strongs_record(number):
 
 def get_strongs_usage_counts(number):
     sql = '''
-        select word, count(*)
-        from MainIndex m
-        join StrongsIndex si
-        on m.WordID = si.WordID
-        where si.StrongsID = %s
-        group by word
+        select word_usage, count(*)
+        from bible
+        where strongs = %s
+        group by word_usage
         order by count(*) desc
         '''
     params = [number]
@@ -65,15 +79,15 @@ def get_strongs_usage_counts(number):
 
 def get_strongs_usage(number):
     sql = '''
-        select Word, BookName, v.Chapter, v.VerseNum, VerseText
-        from MainIndex m
-        join StrongsIndex si
-        on m.WordID = si.WordID
-        join Verses v
-        on v.VerseId = m.VerseId
-        join Books b
-        on b.BookId = v.BookId
-        where si.StrongsID = %s
+        select phrase, b.word_usage, bn.name, b.chapter, b.verse, v.text
+        from bible b
+        join book_name bn
+        on bn.book_id = b.book_id
+        join verses v
+        on v.book_id = b.book_id
+        and v.chapter = b.chapter
+        and v.verse = b.verse
+        where strongs = %s
         '''
     params = [number]
     return get_rows(sql, params)
@@ -110,14 +124,15 @@ def get_verse_edit_data(book, chap, verse):
 
 def get_word_meta(word):
     sql = '''
-        select lemma, xlit, pronounce, language, s.strongsId, count(*)
-        from MainIndex m
-        join StrongsIndex si
-        on si.wordId = m.wordId
-        join Strongs s
-        on s.strongsId = si.strongsId
-        where word = %s
-        group by word, lemma, xlit, pronounce, language, s.strongsId
+        select s.strongs, s.word,
+            count(*) as count, max(json) as json
+        from bible b
+        join strongs s
+        on s.strongs = b.strongs
+        join strongs_json sj
+        on sj.strongs = s.strongs
+        where word_usage = %s
+        group by s.strongs, s.word
         order by count(*) desc
         '''
     params = [word]
@@ -143,12 +158,12 @@ def make_edit(wordId, strongsId):
     cursor.close()
     bible.close()
 
-
 def is_word(word):
     sql = '''
         select count(*)
-        from WordDistinctLower
-        where word = %s
+        from bible
+        where word_usage = %s
+        limit 1
         '''
     params = [word]
     return bool(get_rows(sql, params)[0][0])

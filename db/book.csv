@@ -1,0 +1,67 @@
+book_id,name,author
+1,Genesis,Moses
+2,Exodus,Moses
+3,Leviticus,Moses
+4,Numbers,Moses
+5,Deuteronomy,Moses
+6,Joshua,Joshua
+7,Judges,Judges
+8,Ruth,Ruth
+9,1 Samuel,Samuel
+10,2 Samuel,Samuel
+11,1 Kings,Kings
+12,2 Kings,Kings
+13,1 Chronicles,Chronicles
+14,2 Chronicles,Chronicles
+15,Ezra,Ezra
+16,Nehemiah,Nehemiah
+17,Esther,Esther
+18,Job,Job
+19,Psalms,Psalms
+20,Proverbs,Solomon
+21,Ecclesiastes,Solomon
+22,Song of Songs,Solomon
+23,Isaiah,Isaiah
+24,Jeremiah,Jeremiah
+25,Lamentations,Lamentations
+26,Ezekiel,Ezekiel
+27,Daniel,Daniel
+28,Hosea,Hosea
+29,Joel,Joel
+30,Amos,Amos
+31,Obadiah,Obadiah
+32,Jonah,Jonah
+33,Micah,Micah
+34,Nahum,Nahum
+35,Habakkuk,Habakkuk
+36,Zephaniah,Zephaniah
+37,Haggai,Haggai
+38,Zechariah,Zechariah
+39,Malachi,Malachi
+40,Matthew,Matthew
+41,Mark,Mark
+42,Luke,Luke
+43,John,John the Evangelist
+44,Acts,Luke
+45,Romans,Paul
+46,1 Corinthians,Paul
+47,2 Corinthians,Paul
+48,Galatians,Paul
+49,Ephesians,Paul
+50,Philippians,Paul
+51,Colossians,Paul
+52,1 Thessalonians,Paul
+53,2 Thessalonians,Paul
+54,1 Timothy,Paul
+55,2 Timothy,Paul
+56,Titus,Paul
+57,Philemon,Paul
+58,Hebrews,Paul
+59,James,James
+60,1 Peter,Peter
+61,2 Peter,Peter
+62,1 John,John the Evangelist
+63,2 John,John the Evangelist
+64,3 John,John the Evangelist
+65,Jude,Jude
+66,Revelation,John of Patmos

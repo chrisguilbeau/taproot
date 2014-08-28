@@ -31,12 +31,12 @@ function chart_update(lang, data){
     var myPieChart = new Chart(ctx).Pie(data, pie_options);
 }
 
-function chart_update_greek(data){
-    chart_update('greek', data);
+function chart_update_G(data){
+    chart_update('G', data);
 }
 
-function chart_update_heb(data){
-    chart_update('heb', data);
+function chart_update_H(data){
+    chart_update('H', data);
 }
 
 function scrollToAnchor(aid){

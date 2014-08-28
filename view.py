@@ -4,6 +4,7 @@ from lib import t
 from lib import html5
 from lib import url_for
 from lib import json_encode
+from lib import json_decode
 
 tableau = [
         "#1F77B4",  # blue
@@ -145,10 +146,10 @@ def eng(word, meta):
         return t._(
             t.a(
                 t.div(
-                    t.div(html_encode_utf8(xlit), _class='tight'),
-                    t.div(
-                        '{}'.format(html_encode_utf8(lemma)),
-                        ),
+                    t.div(html_encode_utf8(word), _class='tight'),
+                    # t.div(
+                    #     '{}'.format(html_encode_utf8(lemma)),
+                    #     ),
                     # t.div(html_encode_utf8(pronounce)),
                     # _class='flex-col',
                     ),
@@ -160,24 +161,22 @@ def eng(word, meta):
                 _class='flex-row meta center',
                 )
             for (
-                lemma,
-                xlit,
-                pronounce,
-                lang,
                 strongs,
-                count
-                )in meta if lang == language
+                word,
+                count,
+                json
+                )in meta if strongs[0] == language
             )
     def get_content():
         color = cycle(colors)
         highlight = cycle(highlights)
         def get_data_dict(m):
-            lemma, xlit, pro, lang, strongs, count = m
+            strongs, word, count, json = m
             return dict(
                 value=count,
                 color=next(color),
                 highlight=next(highlight),
-                label=lemma,
+                label='{}'.format(html_encode_utf8(word)),
                 )
         def get_lang(lang, show_word=False):
             def get_language_from_lang(lang):
@@ -206,7 +205,7 @@ def eng(word, meta):
                                 lang,
                                 json_encode(list(
                                     get_data_dict(m) for m in meta
-                                        if m[-3] == lang)),
+                                        if m[0][0] == lang)),
                                 )
                             ),
                         _class='chart-container',
@@ -240,23 +239,20 @@ def eng(word, meta):
                 )
         return t.div(
             t.div(word, _class='word'),
-            get_lang('greek', show_word=False),
+            get_lang('G', show_word=False),
             divider(),
-            get_lang('heb'),
+            get_lang('H'),
             _class='flex-col',
             )
     return page(get_content())
 
-def ref(book, chapter, verse, words):
+def ref(book, chapter, verse, data):
     _verse = verse
     def get_content():
         verse_words = defaultdict(list)
-        for book, chap, verse, word, punc, isItalic, isOp, isCl, strongs in words:
+        for book, chapter, verse, phrase, strongs in data:
             verse_words[verse].append([
-                word,
-                punc,
-                isOp,
-                isCl,
+                phrase,
                 strongs,
                 ])
         return t._(
@@ -266,24 +262,20 @@ def ref(book, chapter, verse, words):
             t._(
                 t.div(
                     t.a(str(verse), '&nbsp', _name='{}'.format(verse)),
-                    # t.span(str(verse), '&nbsp;'),
                     t.span(
                         t._(
                             t.a(
-                                word,
+                                phrase,
                                 href='/strongs/{}'.format(strongs),
                                 _class='ref-word-link',
-                                ) if strongs else word,
-                            punc or '',
-                            '(' if isOp else '',
-                            ')' if isCl else '',
+                                ) if strongs else phrase,
                             ' ',
                         )
-                        for word, punc, isOp, isCl, strongs in words
+                        for phrase, strongs in phrase_data
                         ),
                     _class='verse',
                     )
-                for verse, words in sorted(verse_words.items())
+                for verse, phrase_data in sorted(verse_words.items())
                 ),
             t.script('''
                 scrollToAnchor({});
@@ -295,17 +287,21 @@ def na(text):
     return page(
         '{} has no strongs number and does not appear to be a valid reference'.format(text))
 
-def strongs(number, record, usage, usage_counts):
-    lemma, xlit, pronounce, description, PartOfSpeech, Language = record
+def strongs(strongs, word, jsons, usage_counts, usage):
     color = cycle(colors)
     color2 = cycle(colors)
     highlight = cycle(highlights)
+    mainMeta = json_decode(jsons[0])
+    def getPronun():
+        return mainMeta['pronun']['sbl']
+    def getDefn():
+        return t._(t.div(json_decode(json)['def']['short'] for json in jsons))
     def get_content():
         def get_words_verses_dict():
             result = defaultdict(list)
-            for word, book, chap, verse, text in usage:
+            for phrase, word, book, chap, verse, text in usage:
                 result[word.lower()].append(['{} {}:{}'.format(book, chap, verse),
-                    text.replace(word, '<b>{}</b>'.format(word))])
+                    text.replace(phrase, '<b>{}</b>'.format(phrase))])
             return result
         def get_data_dict(uc):
             word, count = uc
@@ -318,14 +314,11 @@ def strongs(number, record, usage, usage_counts):
         return t.div(
             t.div(
                 t.div(
-                    t.div(html_encode_utf8(lemma), _class='word'),
-                    t.div(html_encode_utf8(xlit)),
-                    t.div(html_encode_utf8(pronounce)),
-                    t.div(Language),
-                    t.div(PartOfSpeech),
+                    t.div(html_encode_utf8(getPronun()), _class='word'),
+                    t.div(html_encode_utf8(word), _class='orig_word'),
                     ),
                 t.div(
-                    t.div(html_encode_utf8(description)),
+                    t.div(html_encode_utf8(getDefn())),
                     _class='definition',
                     ),
                 _class='flex-row tight strongs'
@@ -335,17 +328,18 @@ def strongs(number, record, usage, usage_counts):
                     t.div('Translated As', _class='section-label tight'),
                     t._(
                         t.div(
-                            # t.div(
-                            #     t.div(
-                            #         _class='swatch',
-                            #         style='''
-                            #             background-color: {};
-                            #             '''.format(next(color2)),
-                            #         ),
-                            #     _class='tight',
-                            #     ),
                             t.div(html_encode_utf8(word)),
-                            t.div(str(count), _class='count tight'),
+                            # t.div(str(count), _class='count tight'),
+                            t.div(
+                                t.div(
+                                    '{:,}'.format(count),
+                                    _class='swatch',
+                                    style='''
+                                        background-color: {};
+                                        '''.format(next(color2)),
+                                    ),
+                                _class='flex-row center tight',
+                                ),
                             _class='flex-row tight center',
                             )
                         for word, count in usage_counts
@@ -377,8 +371,13 @@ def strongs(number, record, usage, usage_counts):
                         t._(
                             t.div(
                                 t.span(ref),
+                                # t.a(ref, href='/ref/{}/{}/{}'.format(
+                                #     ref.rsplit(' ', 1)[0],
+                                #     ref.rsplit(' ', 1)[-1].split(':')[0],
+                                #     ref.rsplit(' ', 1)[-1].split(':')[1],
+                                #     )),
                                 t.span(' - '),
-                                t.span(text),
+                                t.span(html_encode_utf8(text)),
                                 _class='verse-text'
                                 )
                             for ref, text in verses

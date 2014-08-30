@@ -17,12 +17,15 @@ def get_rows(sql, params=[]):
     bible.close()
     return result
 
-def get_distinct_words():
+def get_distinct_words(term):
     sql = '''
-        select *
-        from WordDistinctLower
+        select distinct word_usage
+        from bible
+        where word_usage like concat(%s, '%%')
+        order by word_usage
         '''
-    return [word for word, in get_rows(sql)]
+    params = [term]
+    return [word for word, in get_rows(sql, params)]
 
 def get_ref_data(book, chap):
     sql = '''
@@ -79,10 +82,12 @@ def get_strongs_usage_counts(number):
 
 def get_strongs_usage(number):
     sql = '''
-        select phrase, b.word_usage, bn.name, b.chapter, b.verse, v.text
+        select phrase, b.word_usage, bn.name, b.book_id, b.chapter, b.verse, v.text, ba.author
         from bible b
         join book_name bn
         on bn.book_id = b.book_id
+        join book_author ba
+        on ba.book_id = b.book_id
         join verses v
         on v.book_id = b.book_id
         and v.chapter = b.chapter

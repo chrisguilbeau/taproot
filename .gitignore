@@ -1,3 +1,4 @@
+db/taproot_backup.*
 .DS_Store
 static/stats/*
 *.swp

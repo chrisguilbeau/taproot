@@ -1,4 +1,39 @@
-$(document).ready(function(){});
+$(document).ready(function(){
+
+// var countries = new Bloodhound({
+//   datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+//   queryTokenizer: Bloodhound.tokenizers.whitespace,
+//   limit: 10,
+//   prefetch: {
+//     // url points to a json file that contains an array of country names, see
+//     url: "/words_json",
+//     // url: '../data/countries.json',
+//     // the json file contains an array of strings, but the Bloodhound
+//     // suggestion engine expects JavaScript objects so this converts all of
+//     // those strings
+//     filter: function(list) {
+//       return $.map(list, function(country) { return { name: country }; });
+//     }
+//   }
+// });
+
+// // kicks off the loading/processing of `local` and `prefetch`
+// countries.initialize();
+
+// // passing in `null` for the `options` arguments will result in the default
+// // options being used
+// $('input[name=text]').typeahead({
+//     highlight: true
+// }, {
+//   name: 'countries',
+//   displayKey: 'name',
+//   // `ttAdapter` wraps the suggestion engine in an adapter that
+//   // is compatible with the typeahead jQuery plugin
+//   source: countries.ttAdapter()
+// }).bind('typeahead:selected', function(obj, datum) {
+//         $('form').submit();
+//     });
+});
 
 var pie_options = {
     //Boolean - Whether we should show a stroke on each segment
@@ -42,4 +77,28 @@ function chart_update_H(data){
 function scrollToAnchor(aid){
     var aTag = $("a[name='"+ aid +"']");
     $('html,body').animate({scrollTop: aTag.offset().top},'slow');
+}
+
+function resize_charts(){
+    var widths = [];
+    $('canvas').each(function(i, el){{
+        var canvas = $(el);
+        widths.push(canvas.parent().width());
+        }});
+    $('.lang').each(function(i, el){{
+        var lang = $(el);
+        widths.push(lang.height());
+        }});
+    console.log(widths);
+    var min_width = Math.min.apply(Math, widths) - 20;
+    $('canvas')
+        .attr('width', min_width)
+        .attr('height', min_width);
+}
+
+function strongs_change_group(el, group){
+    $(el).parent().children().removeClass('selected');
+    $(el).addClass('selected');
+    $('.strongs_group').hide();
+    $('.' + group).show();
 }

@@ -103,10 +103,13 @@ def ref(book, chap, verse=None):
         data=data,
         )
 
-@app.route('/autocomplete_words/<term>')
+@app.route('/words_json/<term>')
 def autocomplete_words(term):
-    return json_encode(list(word for word in get_distinct_words()
-        if word.startswith(term.lower())))
+    return json_encode(get_distinct_words(term))
+
+@app.route('/words_json')
+def autocomplete_words2():
+    return json_encode(get_distinct_words('%'))
 
 if __name__ == '__main__':
     def get_app_desc():

@@ -3,7 +3,7 @@ from flask import url_for
 from json import dumps as json_encode
 from json import loads as json_decode
 
-def html5(title='', css=[], js=[], metas=[], body=''):
+def html5(title='', css=[], js=[], metas=[], extras=[], body=''):
     def getJs():
         return t._(t.script(src=_js) for _js in js)
     def getCss():
@@ -19,6 +19,7 @@ def html5(title='', css=[], js=[], metas=[], body=''):
                 getCss(),
                 getJs(),
                 getMetas(),
+                extras,
                 ),
             t.body(body),
             ),

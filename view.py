@@ -43,6 +43,10 @@ def page(content):
                     autocomplete='off',
                     spellcheck='off',
                     dir='auto',
+                    onkeydown='''
+                        if (event.which == 13)
+                            $('form').submit();
+                        ''',
                     placeholder='Chapter, Verse, or Word',
                     ),
                 t.input(type='submit', style='display:none;'),
@@ -68,6 +72,7 @@ def page(content):
             ],
         metas={
             'viewport': 'initial-scale=1, user-scalable=no',
+            'apple-mobile-web-app-capable': 'yes',
             },
         extras=[
             t.link(rel='shortcut icon', href='/static/taproot.ico'),
@@ -220,7 +225,7 @@ def eng(word, meta):
                             ),
                         t.script('''
                             $(window).resize(function(){{
-                                chart_update_{}({});
+                                // chart_update_{}({});
                                 }});
                             '''.format(
                                 lang,
@@ -234,11 +239,18 @@ def eng(word, meta):
                     _class='lang flex-row',
                     ),
                     t.script('''
-                        $(document).ready(function(){
+                        $(document).ready(function(){{
                             resize_charts();
-                            $(window).resize();
-                            });
-                        '''),
+                            chart_update_{}({});
+                            //$(window).resize();
+                            }});
+                        '''.format(
+                            lang,
+                            json_encode(list(
+                                get_data_dict(m) for m in meta
+                                    if m[0][0] == lang)),
+                            )
+                        ),
                 )
         def divider():
             return t.div(
@@ -308,13 +320,13 @@ def strongs(strongs, word, jsons, usage_counts, usage):
         def get_book_verses_dict():
             result = defaultdict(list)
             for phrase, word, book, book_id, chap, verse, text, author in usage:
-                result[book].append([book_id, '{}:{}'.format(chap, verse),
+                result[book].append([book_id, '{} {}:{}'.format(book, chap, verse),
                     text.replace(phrase, '<b>{}</b>'.format(phrase))])
             return result
         def get_words_verses_dict():
             result = defaultdict(list)
             for phrase, word, book, book_id, chap, verse, text, author in usage:
-                result[word.lower()].append(['{} {}:{}'.format(book, chap, verse),
+                result[word.lower()].append([word, '{} {}:{}'.format(book, chap, verse),
                     text.replace(phrase, '<b>{}</b>'.format(phrase))])
             return result
         def get_author_verses_dict():
@@ -330,6 +342,55 @@ def strongs(strongs, word, jsons, usage_counts, usage):
                 color=next(color),
                 highlight=next(highlight),
                 label=word,
+                )
+        def get_verse_group(group_class, items, hide=False):
+            return t.div(
+                t._(
+                    t.div(
+                        t.div(
+                            '{} ({})'.format(
+                                group_key, len(verses)),
+                            onclick='''
+                                var offset = $(this).offset().top - 20;
+                                var el = $(this).next('.verse-texts');;
+                                $('.verse-texts').not(el).hide(300);
+                                el.toggle(300, function(){
+                                    $(window).scrollTop(offset);
+                                    });
+                                ''',
+                            _class='verse-word',
+                            ),
+                        t.div(
+                            t._(
+                                t.div(
+                                    t.a(ref, href='/ref/{}/{}/{}'.format(
+                                        ref.rsplit(' ', 1)[0],
+                                        ref.rsplit(' ', 1)[-1].split(':')[0],
+                                        ref.rsplit(' ', 1)[-1].split(':')[-1],
+                                        )),
+                                    # t.a(
+                                    #     ref,
+                                    #     href='/ref/{}/{}/{}'.format(
+                                    #         ref.rsplit(' ', 1)[0],
+                                    #         ref.rsplit(' ', 1)[1].split(':')[0],
+                                    #         ref.rsplit(' ', 1)[1].split(':')[1],
+                                    #         ),
+                                    #     ),
+                                    t.span(' - '),
+                                    t.span(html_encode_utf8(text)),
+                                    _class='verse-text'
+                                    )
+                                for key, ref, text in verses
+                                ),
+                            _class='verse-texts',
+                            ),
+                        )
+                    for group_key, verses in items
+                    ),
+                _class='strongs_group {} {}'.format(
+                    group_class,
+                    'hide' if hide else '',
+                    ),
                 )
         return t.div(
             t.div(
@@ -375,7 +436,7 @@ def strongs(strongs, word, jsons, usage_counts, usage):
                     t.canvas(id='chart_eng', width='150', height='150'),
                     t.script('''
                         $(window).resize(function(){{
-                            chart_update('eng', {});
+                            // chart_update('eng', {});
                             }});
                         '''.format(
                             json_encode(list(
@@ -389,95 +450,57 @@ def strongs(strongs, word, jsons, usage_counts, usage):
             t.div(
                 t.div(
                     t.div(
+                        t.div(),
                         t.div(
-                            'Appears as',
+                            'By Word',
                             onclick="strongs_change_group(this, 'by_word');",
-                            _class='tight selected',
+                            _class='usage-sorter first tight selected',
                             ),
                         t.div(
-                            'Appears in',
+                            'By Book',
                             onclick="strongs_change_group(this, 'by_book');",
-                            _class='tight',
+                            _class='usage-sorter tight',
                             ),
                         t.div(
-                            'Used by',
+                            'By Author',
                             onclick="strongs_change_group(this, 'by_author');",
-                            _class='tight',
+                            _class='usage-sorter tight',
                             ),
                         t.div(),
                         _class='usage-sort flex-row',
                         ),
-                    t.div('Tap to change grouping', _class='hint'),
                     _class='sort-control',
                     ),
-                t.div(
-                    t._(
-                        t.div(
-                            t.div('{}'.format(author),
-                                _class='verse-word'),
-                            t._(
-                                t.div(
-                                    t.span(ref),
-                                    t.span(' - '),
-                                    t.span(html_encode_utf8(text)),
-                                    _class='verse-text'
-                                    )
-                                for author, ref, text in verses
-                                ),
-                            )
-                        for author, verses in sorted(
-                            get_author_verses_dict().items(), key=lambda a: a[1][-1])
-                        ),
-                    _class='strongs_group by_author hide',
+                # t.div('Tap above to change grouping', _class='hint'),
+                # t.div('Tap below to expand', _class='hint'),
+                get_verse_group(
+                    'by_author',
+                    sorted(get_author_verses_dict().items(),
+                        key=lambda a: a[1][-1]),
+                    hide=True,
                     ),
-                t.div(
-                    t._(
-                        t.div(
-                            t.div('{}'.format(book),
-                                _class='verse-word'),
-                            t._(
-                                t.div(
-                                    t.span(ref),
-                                    t.span(' - '),
-                                    t.span(html_encode_utf8(text)),
-                                    _class='verse-text'
-                                    )
-                                for book_id, ref, text in verses
-                                ),
-                            )
-                        for book, verses in sorted(
-                            get_book_verses_dict().items(), key=lambda a: a[1][0])
-                        ),
-                    _class='strongs_group by_book hide',
+                get_verse_group(
+                    'by_book',
+                    sorted(get_book_verses_dict().items(),
+                        key=lambda a: a[1][0]),
+                    hide=True,
                     ),
-                t.div(
-                    t._(
-                        t.div(
-                            t.div('{}'.format(word, len(verses)),
-                                _class='verse-word'),
-                            t._(
-                                t.div(
-                                    t.span(ref),
-                                    t.span(' - '),
-                                    t.span(html_encode_utf8(text)),
-                                    _class='verse-text'
-                                    )
-                                for ref, text in verses
-                                ),
-                            )
-                        for word, verses in sorted(
-                            get_words_verses_dict().items(),
-                                key=lambda a: len(a[1]), reverse=True)
-                        ),
-                    _class='strongs_group by_word',
+                get_verse_group(
+                    'by_word',
+                    sorted(get_words_verses_dict().items(),
+                        key=lambda a: len(a[1]), reverse=True),
                     ),
                 _class='verses-container',
                 ),
                 t.script('''
-                    $(document).ready(function(){
+                    $(document).ready(function(){{
                         resize_charts();
-                        $(window).resize();
-                        });
-                    '''),
+                        chart_update('eng', {});
+                        }});
+                    '''.format(
+                        json_encode(list(
+                            get_data_dict(uc) for uc in usage_counts)),
+                        )
+                    ),
             )
     return page(get_content())
